@@ -7,6 +7,7 @@
 //
 
 #import "YUTableView.h"
+#import "BasicTableViewCell.h"
 
 @interface YUTableView () < UITableViewDataSource, UITableViewDelegate>
 
@@ -39,7 +40,8 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault reuseIdentifier: cellID];
     }
-
+    
+    ((BasicTableViewCell *)cell).delegate = self.parentView;
     [((UITableViewCell <YUTableViewCellDelegate> *)cell) setCellContentsFromItem: item];
     return cell;
 }
@@ -50,30 +52,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     YUTableViewItem * selectedItem = (YUTableViewItem *) _activeTableViewItems [indexPath.row];
-    
     if ([_parentView respondsToSelector: @selector (didSelectedRow:)])
     {
         [_parentView didSelectedRow: selectedItem];
     }
-    
-    if (selectedItem == _activeHeader && !_showAllItems)
-    {
-        return;
-    }
-    
-    if (selectedItem.subItems != nil && selectedItem.subItems.count > 0)
-    {
-        _activeHeader = selectedItem;
-        [self reloadTable: selectedItem];
-    }
-    else
-    {
-        _activeSubitem.status = YUTableViewItemStatusNormal;
-        _activeSubitem        = selectedItem;
-        selectedItem.status   = YUTableViewItemStatusSelected;
-        [self reloadData];
-    }
-    
 }
 
 - (CGFloat) tableView: (UITableView *) tableView heightForRowAtIndexPath: (NSIndexPath *) indexPath
@@ -286,6 +268,21 @@
             [self reloadTable: item];
     }
 
+}
+
+- (void)deselectItem:(YUTableViewItem *)item animate:(BOOL)animate {
+    if (item.subItems != nil && item.subItems.count > 0)
+    {
+        _activeHeader = item;
+        [self reloadTable: item];
+    }
+    else
+    {
+        _activeSubitem.status = YUTableViewItemStatusNormal;
+        _activeSubitem        = item;
+        item.status   = YUTableViewItemStatusSelected;
+        [self reloadData];
+    }
 }
 
 - (NSUInteger) getDisplayedSubitemCount: (YUTableViewItem * ) selectedItem
