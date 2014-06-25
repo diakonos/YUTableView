@@ -83,6 +83,7 @@
  @param animate If YES animates while selecting item.
  */
 - (void) selectItem : (YUTableViewItem *) item animate: (BOOL) animate;
+- (void) deselectItem : (YUTableViewItem *) item animate: (BOOL) animate;
 
 @end
 
